@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HackChat WebSocket Proxy</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .usage {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .feature {
+            margin: 15px 0;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .feature:last-child {
+            border-bottom: none;
+        }
+        .test-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 HackChat WebSocket Proxy</h1>
+        
+        <div class="status">
+            ✅ Proxy service is running and ready to accept connections
+        </div>
+
+        <div class="usage">
+            <h3>📖 Usage</h3>
+            <p>Connect to this WebSocket proxy instead of hack.chat directly:</p>
+            <div class="code">wss://your-domain.com/chat-ws</div>
+            <p>This proxy will forward all messages to and from <code>wss://hack.chat/chat-ws</code></p>
+        </div>
+
+        <h3>✨ Features</h3>
+        <div class="feature">
+            <strong>🔄 Auto Reconnection:</strong> Automatically reconnects to hack.chat if connection is lost
+        </div>
+        <div class="feature">
+            <strong>💓 Heartbeat Monitoring:</strong> Keeps connections alive with periodic health checks
+        </div>
+        <div class="feature">
+            <strong>🛡️ Error Handling:</strong> Robust error handling and connection management
+        </div>
+        <div class="feature">
+            <strong>📊 Connection Pooling:</strong> Efficient management of multiple concurrent connections
+        </div>
+        <div class="feature">
+            <strong>🌐 CORS Support:</strong> Cross-origin requests are properly handled
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Test Connection</h3>
+            <p>Click the button below to test the WebSocket connection:</p>
+            <button onclick="testConnection()">Test WebSocket Connection</button>
+            <button onclick="clearLog()">Clear Log</button>
+            <div id="log"></div>
+        </div>
+
+        <div style="margin-top: 30px; text-align: center; color: #666;">
+            <p>Powered by Vercel • Built for hack.chat</p>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let logElement = document.getElementById('log');
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function clearLog() {
+            logElement.innerHTML = '';
+        }
+
+        function testConnection() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                log('❌ Closing existing connection...');
+                ws.close();
+                return;
+            }
+
+            const wsUrl = `wss://${window.location.host}/chat-ws`;
+            log(`🔗 Connecting to ${wsUrl}...`);
+
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = function() {
+                log('✅ WebSocket connection opened');
+                
+                // 发送加入房间的消息
+                const joinMessage = {
+                    cmd: 'join',
+                    channel: 'test',
+                    nick: 'ProxyTester'
+                };
+                ws.send(JSON.stringify(joinMessage));
+                log('📤 Sent join message');
+            };
+
+            ws.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    log(`📥 Received: ${data.cmd || 'unknown'} - ${JSON.stringify(data).substring(0, 100)}...`);
+                } catch (e) {
+                    log(`📥 Received: ${event.data.substring(0, 100)}...`);
+                }
+            };
+
+            ws.onclose = function(event) {
+                log(`❌ WebSocket connection closed (code: ${event.code})`);
+                ws = null;
+            };
+
+            ws.onerror = function(error) {
+                log(`💥 WebSocket error: ${error}`);
+            };
+        }
+    </script>
+</body>
+</html>

@@ -5,14 +5,10 @@
       "runtime": "nodejs18.x"
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/chat-ws",
-      "dest": "/api/chat-ws"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.html"
+      "source": "/chat-ws",
+      "destination": "/api/chat-ws"
     }
   ],
   "headers": [
