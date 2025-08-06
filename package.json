@@ -1,0 +1,26 @@
+{
+  "name": "hackchat-websocket-proxy",
+  "version": "1.0.0",
+  "description": "WebSocket proxy for hack.chat on Vercel",
+  "main": "api/chat-ws.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required'",
+    "start": "node api/chat-ws.js"
+  },
+  "dependencies": {
+    "ws": "^8.14.2",
+    "http-proxy-middleware": "^2.0.6"
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "keywords": [
+    "websocket",
+    "proxy",
+    "hackchat",
+    "vercel"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
